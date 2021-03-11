@@ -3,6 +3,8 @@ import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { getAllPost } from "../lib";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Menu from "../components/menu";
 
 export default function Home(props: any) {
@@ -12,6 +14,10 @@ export default function Home(props: any) {
 
   useEffect(() => {
     updateButtons(current);
+    if (process.browser) {
+      gsap.registerPlugin(ScrollTrigger);
+      setAnimation(current);
+    }
   }, [current]);
 
   function updateButtons(current: number) {
@@ -35,8 +41,16 @@ export default function Home(props: any) {
     setCurrent((current + 1) % 4);
   }
 
+  function setAnimation(current: number) {
+    gsap.from("#wrapper", {
+      backgroundColor: "white",
+      duration: 2,
+      opacity: 1,
+    });
+  }
+
   return (
-    <div className="wrapper">
+    <div id="wrapper">
       <div className="container">
         <Head>
           <title>recpar_ranch</title>
@@ -63,7 +77,7 @@ export default function Home(props: any) {
       </div>
       <style jsx>
         {`
-          .wrapper {
+          #wrapper {
             background: url(${data[current].image}) no-repeat center center
               fixed;
             background-size: cover;
