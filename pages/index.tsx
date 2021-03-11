@@ -3,7 +3,12 @@ import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { getAllPost } from "../lib";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Menu from "../components/menu";
+import Left from "../components/left";
+import Right from "../components/right";
+import { Router } from "next/dist/client/router";
 
 export default function Home(props: any) {
   const data = props.data;
@@ -12,6 +17,10 @@ export default function Home(props: any) {
 
   useEffect(() => {
     updateButtons(current);
+    if (process.browser) {
+      gsap.registerPlugin(ScrollTrigger);
+      setAnimation();
+    }
   }, [current]);
 
   function updateButtons(current: number) {
@@ -35,8 +44,16 @@ export default function Home(props: any) {
     setCurrent((current + 1) % 4);
   }
 
+  function setAnimation() {
+    gsap.from("#wrapper", {
+      backgroundColor: "white",
+      duration: 2,
+      opacity: 1,
+    });
+  }
+
   return (
-    <div className="wrapper">
+    <div id="wrapper">
       <div className="container">
         <Head>
           <title>recpar_ranch</title>
@@ -47,23 +64,32 @@ export default function Home(props: any) {
           <Menu />
         </nav>
         <main className="d-flex flex-column justify-content-end pb-5">
-          <h1 className="display-2">{data[current].title}</h1>
-          <p className="h2">{data[current].username}</p>
+          <a href={data[current].url} target="_blank" rel="noopener">
+            <h1 className="display-2">{data[current].title}</h1>
+            <p className="h2">{data[current].username}</p>
+          </a>
         </main>
 
-        <footer className="d-flex justify-content-center">
+        <footer className="d-flex flex-column justify-content-center align-items-center">
           <div ref={buttons} className="col-md-1 d-flex">
             <i className="mr-5" />
             <i className="mr-5" />
             <i className="mr-5" />
             <i className="mr-5" />
           </div>
-          <button onClick={onClick}>Click</button>
+          <div className="controller mx-5">
+            <button onClick={onClick}>
+              <Left />
+            </button>{" "}
+            <button onClick={onClick}>
+              <Right />
+            </button>
+          </div>
         </footer>
       </div>
       <style jsx>
         {`
-          .wrapper {
+          #wrapper {
             background: url(${data[current].image}) no-repeat center center
               fixed;
             background-size: cover;
